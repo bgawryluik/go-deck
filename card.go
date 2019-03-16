@@ -2,7 +2,10 @@
 
 package deck
 
-import "fmt"
+import (
+	"fmt"
+	"sort"
+)
 
 // Suit represents each playing card suit.
 type Suit uint8
@@ -88,4 +91,29 @@ func New(opts ...func([]Card) []Card) []Card {
 	}
 
 	return cards
+}
+
+// DefaultSort returns a sorted deck of cards.
+func DefaultSort(cards []Card) []Card {
+	sort.Slice(cards, Less(cards))
+	return cards
+}
+
+// Sort ...
+func Sort(less func(cards []Card) func(i, j int) bool) func([]Card) []Card {
+	return func(cards []Card) []Card {
+		sort.Slice(cards, less(cards))
+		return cards
+	}
+}
+
+// Less ...
+func Less(cards []Card) func(i, j int) bool {
+	return func(i, j int) bool {
+		return absRank(cards[i]) < absRank(cards[j])
+	}
+}
+
+func absRank(c Card) int {
+	return int(c.Suit)*int(maxRank) + int(c.Rank)
 }
