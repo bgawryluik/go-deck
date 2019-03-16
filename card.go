@@ -2,33 +2,90 @@
 
 package deck
 
+import "fmt"
+
+// Suit represents each playing card suit.
 type Suit uint8
 
 const (
+	// Spade suits are sorted first in most new decks.
 	Spade Suit = iota
+	// Diamond suits are sorted second.
 	Diamond
+	// Club suits are sorted third.
 	Club
+	// Heart suits are sorted last.
 	Heart
-	Joker // this is a special case
+	// Joker cards are a special case.
+	Joker
 )
 
 var suits = [...]Suit{Spade, Diamond, Club, Heart}
 
+// Rank represents each playing card rank.
 type Rank uint8
 
 const (
 	_ Rank = iota
+	// Ace represents rank 1.
 	Ace
+	// Two represents rank 2.
 	Two
+	// Three represents rank 3.
 	Three
+	// Four represents rank 4.
 	Four
+	// Five represents rank 5.
 	Five
+	// Six represents rank 6.
 	Six
+	// Seven represents rank 7.
 	Seven
+	// Eight represents rank 8.
 	Eight
+	// Nine represents rank 9.
 	Nine
+	// Ten represents rank 10.
 	Ten
+	// Jack represents rank 11.
 	Jack
+	// Queen represents rank 12.
 	Queen
+	// King represents rank 13.
 	King
 )
+
+const (
+	minRank = Ace
+	maxRank = King
+)
+
+// Card data includes a Suit and a Rank.
+type Card struct {
+	Suit
+	Rank
+}
+
+func (c Card) String() string {
+	if c.Suit == Joker {
+		return c.Suit.String()
+	}
+
+	return fmt.Sprintf("%s of %ss", c.Rank.String(), c.Suit.String())
+}
+
+// New creates a slice or deck of type Card.
+func New(opts ...func([]Card) []Card) []Card {
+	var cards []Card
+	for _, suit := range suits {
+		for rank := minRank; rank <= maxRank; rank++ {
+			cards = append(cards, Card{Suit: suit, Rank: rank})
+		}
+	}
+
+	for _, opt := range opts {
+		cards = opt(cards)
+	}
+
+	return cards
+}
